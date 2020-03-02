@@ -1,0 +1,35 @@
+version: "3.4"
+
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: adnymics
+      MYSQL_HOST: localhost
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+    volumes:
+      - ./adnymics.sql:/docker-entrypoint-initdb.d/adnymics.sql
+  server:
+    build: .
+    depends_on:
+      - mysql
+    expose:
+      - 8081
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: adnymics
+      MYSQL_HOST: localhost
+      MYSQL_HOST_IP: mysql
+    ports:
+      - 8081:8081
+    volumes:
+      - ./:/adnyimics/app
+    links:
+      - mysql
+    command: npm start
